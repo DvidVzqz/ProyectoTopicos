@@ -16,7 +16,7 @@ def login():
         ventana.destroy()
         # Aquí puedes abrir la ventana principal o realizar otras acciones
     else:
-        messagebox.showerror("Error", "Usuario o contraseña 
+        messagebox.showerror("Error", "Usuario o contraseña")
 
 # Crear la ventana principal
 ventana = tk.Tk()
@@ -30,7 +30,7 @@ usuario_entry.pack()
 
 contrasena_label = tk.Label(ventana, text="Contraseña:")
 contrasena_label.pack()
-contrasena_entry = tk.Entry(ventana, show="*") 1 
+contrasena_entry = tk.Entry(ventana, show="*")
 contrasena_entry.pack()
 
 # Crear botón de inicio de sesión
