@@ -1,4 +1,6 @@
+from PyQt5.uic.properties import QtWidgets
 from ..DB import conectar
+import mysql.connector
 # Crear un usuario
 def crear_usuario(nombre, apellido, usuario, contraseña, rol):
     conn = conectar()
@@ -17,14 +19,22 @@ def crear_usuario(nombre, apellido, usuario, contraseña, rol):
         conn.close()
 
 # Leer usuarios
-def leer_usuarios():
+def leer_usuarios(tabla_users):
     conn = conectar()
     cursor = conn.cursor()
     try:
         cursor.execute("SELECT * FROM Usuarios")
         resultados = cursor.fetchall()
-        for usuario in resultados:
-            print(usuario)
+
+        tabla_users.setRowCount(len(resultados))
+        tabla_users.setColumnCount(len(resultados[0]) if resultados else 0)
+        tabla_users.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+
+
+        for row_idx, row_data in enumerate(resultados):
+            for col_idx, col_data in enumerate(row_data):
+                tabla_users.setItem(row_idx, col_idx, QtWidgets.QTableWidgetItem(str(col_data)))
+
     except mysql.connector.Error as err:
         print("Error al leer usuarios:", err)
     finally:
