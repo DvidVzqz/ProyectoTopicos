@@ -1,19 +1,21 @@
-from PyQt5.uic.properties import QtWidgets
-from ..DB import conectar
+from PyQt5 import QtWidgets
+from DB import conectar
 import mysql.connector
 # Crear un usuario
-def crear_usuario(nombre, apellido, usuario, contraseña, rol):
+def crear_usuario(nombre, apellido, usuario, contraseña, rol, telefono):
     conn = conectar()
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO Usuarios (nombre, apellido, usuario, contraseña, rol)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (nombre, apellido, usuario, contraseña, rol))
+            INSERT INTO usuarios (nombre, apellido, usuario, contraseña, rol, telefono)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (nombre, apellido, usuario, contraseña, rol, telefono))
         conn.commit()
         print("Usuario creado exitosamente.")
+        return True
     except mysql.connector.Error as err:
         print("Error al crear usuario:", err)
+        return False
     finally:
         cursor.close()
         conn.close()
@@ -23,7 +25,7 @@ def leer_usuarios(tabla_users):
     conn = conectar()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT * FROM Usuarios")
+        cursor.execute("SELECT * FROM usuarios")
         resultados = cursor.fetchall()
 
         tabla_users.setRowCount(len(resultados))
@@ -45,7 +47,7 @@ def leer_usuario_especifico(id_usuario):
     conn = conectar()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT * FROM Usuarios WHERE id_usuario = %s", (id_usuario,))
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
         resultados = cursor.fetchall()
         for usuario in resultados:
             print(usuario)
@@ -56,7 +58,7 @@ def leer_usuario_especifico(id_usuario):
         conn.close()
 
 # Actualizar un usuario
-def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, contraseña=None, rol=None):
+def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, contraseña=None, rol=None, telefono=None):
     conn = conectar()
     cursor = conn.cursor()
     try:
@@ -77,17 +79,22 @@ def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, con
         if rol:
             campos.append("rol = %s")
             valores.append(rol)
+        if telefono:
+            campos.append("telefono = %s")
+            valores.append(contraseña)
         valores.append(id_usuario)
 
         cursor.execute(f"""
-            UPDATE Usuarios
+            UPDATE usuarios
             SET {", ".join(campos)}
             WHERE id_usuario = %s
         """, valores)
         conn.commit()
         print("Usuario actualizado exitosamente.")
+        return True
     except mysql.connector.Error as err:
         print("Error al actualizar usuario:", err)
+        return False
     finally:
         cursor.close()
         conn.close()
@@ -97,7 +104,7 @@ def eliminar_usuario(id_usuario):
     conn = conectar()
     cursor = conn.cursor()
     try:
-        cursor.execute("DELETE FROM Usuarios WHERE id_usuario = %s", (id_usuario,))
+        cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id_usuario,))
         conn.commit()
         print("Usuario eliminado exitosamente.")
     except mysql.connector.Error as err:

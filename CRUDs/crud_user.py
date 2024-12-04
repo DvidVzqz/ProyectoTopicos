@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from CRUDs.Usuarios import leer_usuarios
+from Usuarios import leer_usuarios, actualizar_usuario, crear_usuario
 
 
 class Ui_crud_user(object):
@@ -189,6 +189,82 @@ class Ui_crud_user(object):
 
         self.retranslateUi(crud_user)
         QtCore.QMetaObject.connectSlotsByName(crud_user)
+        
+        self.boton_actualizar.clicked.connect(self.actualizar_usuario)
+        self.boton_agregar.clicked.connect(self.agregar_usuario)
+        self.tabla_users.selectionModel().selectionChanged.connect(self.actualizar_campos)
+        
+    def actualizar_usuario(self):
+        fila_seleccionada = self.tabla_users.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un usuario para actualizar.")
+            return
+        
+        # Obtén el ID del usuario de la primera columna (o ajusta según la estructura)
+        user_id = self.tabla_users.item(fila_seleccionada, 0).text()
+        
+        # Obtén los nuevos valores de los campos de entrada
+        nombre = self.introducir_nom.text()
+        apellido = self.introducir_ap.text()
+        usuario = self.introducir_user.text()
+        telefono = self.introducir_tel.text()
+        contraseña = self.introducir_contra.text()
+        rol = self.introducir_rol.currentText()
+        
+        if not all([nombre, apellido, usuario, telefono, contraseña]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if actualizar_usuario(user_id,nombre,apellido,usuario,contraseña,rol,telefono):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Usuario actualizado correctamente.")
+            leer_usuarios(self.tabla_users) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", f"Error al actualizar: {err}")
+        
+    def agregar_usuario(self):
+        fila_seleccionada = self.tabla_users.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un usuario para actualizar.")
+            return
+        
+        # Obtén los nuevos valores de los campos de entrada
+        nombre = self.introducir_nom.text()
+        apellido = self.introducir_ap.text()
+        usuario = self.introducir_user.text()
+        telefono = self.introducir_tel.text()
+        contraseña = self.introducir_contra.text()
+        rol = self.introducir_rol.currentText()
+        
+        if not all([nombre, apellido, usuario, telefono, contraseña]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if crear_usuario(nombre,apellido,usuario,contraseña,rol,telefono):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Usuario creado correctamente.")
+            leer_usuarios(self.tabla_users) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", f"Error al crear: {err}")
+
+    def actualizar_campos(self):
+        fila_seleccionada = self.tabla_users.currentRow()
+        if fila_seleccionada == -1:
+                return
+
+        nombre = self.tabla_users.item(fila_seleccionada, 1).text()  
+        apellido = self.tabla_users.item(fila_seleccionada, 2).text()  
+        usuario = self.tabla_users.item(fila_seleccionada, 3).text()  
+        contraseña = self.tabla_users.item(fila_seleccionada, 4).text()  
+        rol = self.tabla_users.item(fila_seleccionada, 5).text()  
+        telefono = self.tabla_users.item(fila_seleccionada, 6).text()  
+
+        self.introducir_nom.setText(nombre)
+        self.introducir_ap.setText(apellido)
+        self.introducir_user.setText(usuario)
+        self.introducir_tel.setText(telefono)
+        self.introducir_contra.setText(contraseña)
+
+        # Selecciona el rol correspondiente
+        index_rol = self.introducir_rol.findText(rol)
+        if index_rol != -1:
+                self.introducir_rol.setCurrentIndex(index_rol)
 
     def retranslateUi(self, crud_user):
         _translate = QtCore.QCoreApplication.translate
