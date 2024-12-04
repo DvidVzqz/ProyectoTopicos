@@ -10,6 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from Medicos import leer_medico, actualizar_medico, crear_medico, eliminar_medico
+
 
 class Ui_crud_medi(object):
     def setupUi(self, crud_medi):
@@ -36,8 +38,7 @@ class Ui_crud_medi(object):
         self.tabla_medi = QtWidgets.QTableWidget(self.centralwidget)
         self.tabla_medi.setGeometry(QtCore.QRect(50, 140, 981, 192))
         self.tabla_medi.setObjectName("tabla_medi")
-        self.tabla_medi.setColumnCount(0)
-        self.tabla_medi.setRowCount(0)
+        leer_medico(self.tabla_medi)
         self.introducir_tel3 = QtWidgets.QLineEdit(self.centralwidget)
         self.introducir_tel3.setGeometry(QtCore.QRect(60, 570, 301, 51))
         font = QtGui.QFont()
@@ -165,6 +166,91 @@ class Ui_crud_medi(object):
 
         self.retranslateUi(crud_medi)
         QtCore.QMetaObject.connectSlotsByName(crud_medi)
+        
+        self.boton_actualizar3.clicked.connect(self.actualizar_medico)
+        self.boton_agregar3.clicked.connect(self.agregar_medico)
+        self.boton_eliminar3.clicked.connect(self.eliminar_medico)
+        self.boton_salir6.clicked.connect(self.salir)
+        self.tabla_medi.selectionModel().selectionChanged.connect(self.actualizar_campos)
+        
+    def actualizar_medico(self):
+        fila_seleccionada = self.tabla_medi.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un medico para actualizar.")
+            return
+        
+        medico_id = self.tabla_medi.item(fila_seleccionada, 0).text()
+        
+        nombre = self.introducir_nom3.text()
+        apellido = self.introducir_ap3.text()
+        especialidad = self.introducir_espe.text()
+        telefono = self.introducir_tel3.text()
+        email = self.introducir_email.text()
+        
+        if not all([nombre, apellido, especialidad, telefono, email]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if actualizar_medico(medico_id,nombre,apellido,especialidad,telefono,email):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Medico actualizado correctamente.")
+            leer_medico(self.tabla_medi) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al actualizar medico")
+        
+    def agregar_medico(self):
+        fila_seleccionada = self.tabla_medi.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un medico para actualizar.")
+            return
+        
+        nombre = self.introducir_nom3.text()
+        apellido = self.introducir_ap3.text()
+        especialidad = self.introducir_espe.text()
+        telefono = self.introducir_tel3.text()
+        email = self.introducir_email.text()
+        
+        if not all([nombre, apellido, especialidad, telefono, email]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if crear_medico(nombre,apellido,especialidad,telefono,email):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Medico creado correctamente.")
+            leer_medico(self.tabla_medi) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al crear medico")
+            
+    def eliminar_medico(self):
+        fila_seleccionada = self.tabla_medi.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un medico para eliminarlo.")
+            return
+        
+        medico_id = self.tabla_medi.item(fila_seleccionada, 0).text()
+        
+        if eliminar_medico(medico_id):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Medico eliminado correctamente.")
+            leer_medico(self.tabla_medi) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al eliminar medico")
+
+    def actualizar_campos(self):
+        fila_seleccionada = self.tabla_medi.currentRow()
+        if fila_seleccionada == -1:
+            return
+
+        nombre = self.tabla_medi.item(fila_seleccionada, 1).text()  
+        apellido = self.tabla_medi.item(fila_seleccionada, 2).text()  
+        especialidad = self.tabla_medi.item(fila_seleccionada, 3).text()  
+        telefono = self.tabla_medi.item(fila_seleccionada, 4).text() 
+        email = self.tabla_medi.item(fila_seleccionada, 5).text() 
+
+        self.introducir_nom3.setText(nombre)
+        self.introducir_ap3.setText(apellido)
+        self.introducir_espe.setText(especialidad)
+        self.introducir_tel3.setText(telefono)
+        self.introducir_email.setText(email)
+
+    def salir(self):
+        print("Cerrando el programa...")
+        QtWidgets.QApplication.instance().quit()
 
     def retranslateUi(self, crud_medi):
         _translate = QtCore.QCoreApplication.translate

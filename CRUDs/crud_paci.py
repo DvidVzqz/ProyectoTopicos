@@ -10,6 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from Pacientes import leer_pacientes, actualizar_paciente, crear_paciente, eliminar_paciente
+
 
 class Ui_crud_paci(object):
     def setupUi(self, crud_paci):
@@ -99,8 +101,7 @@ class Ui_crud_paci(object):
         self.tabla_paci = QtWidgets.QTableWidget(self.centralwidget)
         self.tabla_paci.setGeometry(QtCore.QRect(50, 140, 981, 192))
         self.tabla_paci.setObjectName("tabla_paci")
-        self.tabla_paci.setColumnCount(0)
-        self.tabla_paci.setRowCount(0)
+        leer_pacientes(self.tabla_paci)
         self.boton_agregar2 = QtWidgets.QPushButton(self.centralwidget)
         self.boton_agregar2.setGeometry(QtCore.QRect(60, 350, 301, 51))
         font = QtGui.QFont()
@@ -151,7 +152,7 @@ class Ui_crud_paci(object):
         self.introducir_fecha.setObjectName("introducir_fecha")
         self.introducir_sexo = QtWidgets.QComboBox(self.centralwidget)
         self.introducir_sexo.setGeometry(QtCore.QRect(60, 570, 301, 51))
-        self.introducir_sexo.setStyleSheet("font-family: Decotura ICG;\n"
+        self.introducir_sexo.setStyleSheet("font-fami, contraseñaly: Decotura ICG;\n"
 "font-size: 20pt;\n"
 "border: 3px solid #c0c0c0;\n"
 "padding: 5px;")
@@ -162,6 +163,96 @@ class Ui_crud_paci(object):
 
         self.retranslateUi(crud_paci)
         QtCore.QMetaObject.connectSlotsByName(crud_paci)
+        
+        self.boton_actualizar2.clicked.connect(self.actualizar_paciente)
+        self.boton_agregar2.clicked.connect(self.agregar_paciente)
+        self.boton_eliminar2.clicked.connect(self.eliminar_paciente)
+        self.boton_salir5.clicked.connect(self.salir)
+        self.tabla_paci.selectionModel().selectionChanged.connect(self.actualizar_campos)
+        
+    def actualizar_paciente(self):
+        fila_seleccionada = self.tabla_paci.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un paciente para actualizar.")
+            return
+        
+        
+        paciente_id = self.tabla_paci.item(fila_seleccionada, 0).text()
+        
+        nombre = self.introducir_nom2.text()
+        apellido = self.introducir_ap2.text()
+        fecha = self.introducir_fecha.text()
+        sexo = self.introducir_sexo.currentText()
+        telefono = self.introducir_tel2.text()
+        
+        if not all([nombre, apellido, fecha, telefono]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if actualizar_paciente(paciente_id,nombre,apellido,fecha,sexo,telefono):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Paciente actualizado correctamente.")
+            leer_pacientes(self.tabla_paci) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al actualizar Paciente")
+            
+    def agregar_paciente(self):
+        fila_seleccionada = self.tabla_paci.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un paciente para actualizar.")
+            return
+        
+        nombre = self.introducir_nom2.text()
+        apellido = self.introducir_ap2.text()
+        fecha = self.introducir_fecha.text()
+        sexo = self.introducir_sexo.currentText()
+        telefono = self.introducir_tel2.text()
+        
+        if not all([nombre, apellido, fecha, telefono]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if crear_paciente(nombre,apellido,fecha,sexo,telefono):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Paciente creado correctamente.")
+            leer_pacientes(self.tabla_paci) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al crear Paciente")
+            
+    def eliminar_paciente(self):
+        fila_seleccionada = self.tabla_paci.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un paciente para eliminarlo.")
+            return
+        
+        paciente_id = self.tabla_paci.item(fila_seleccionada, 0).text()
+        
+        if eliminar_paciente(paciente_id):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Paciente eliminado correctamente.")
+            leer_pacientes(self.tabla_paci) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al eliminar Paciente")
+
+    def actualizar_campos(self):
+        fila_seleccionada = self.tabla_paci.currentRow()
+        if fila_seleccionada == -1:
+            return
+
+        nombre = self.tabla_paci.item(fila_seleccionada, 1).text()  
+        apellido = self.tabla_paci.item(fila_seleccionada, 2).text()  
+        fecha = self.tabla_paci.item(fila_seleccionada, 3).text() 
+        sexo = self.tabla_paci.item(fila_seleccionada, 4).text()  
+        telefono = self.tabla_paci.item(fila_seleccionada, 5).text()  
+
+        self.introducir_nom2.setText(nombre)
+        self.introducir_ap2.setText(apellido)
+        self.introducir_fecha.setText(fecha)
+        self.introducir_tel2.setText(telefono)
+
+        
+        index_sexo = self.introducir_sexo.findText(sexo)
+        if index_sexo != -1:
+              self.introducir_sexo.setCurrentIndex(index_sexo)
+              
+    def salir(self):
+        print("Cerrando el programa...")
+        QtWidgets.QApplication.instance().quit()
 
     def retranslateUi(self, crud_paci):
         _translate = QtCore.QCoreApplication.translate

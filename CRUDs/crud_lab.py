@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from Laboratorista import leer_laboratorista, actualizar_laboratorista, crear_laboratorista, eliminar_laboratorista
 
 class Ui_crud_lab(object):
     def setupUi(self, crud_lab):
@@ -41,8 +42,7 @@ class Ui_crud_lab(object):
         self.tabla_lab = QtWidgets.QTableWidget(self.centralwidget)
         self.tabla_lab.setGeometry(QtCore.QRect(50, 140, 981, 192))
         self.tabla_lab.setObjectName("tabla_lab")
-        self.tabla_lab.setColumnCount(0)
-        self.tabla_lab.setRowCount(0)
+        leer_laboratorista(self.tabla_lab)
         self.introducir_email2 = QtWidgets.QLineEdit(self.centralwidget)
         self.introducir_email2.setGeometry(QtCore.QRect(60, 570, 301, 51))
         font = QtGui.QFont()
@@ -158,6 +158,87 @@ class Ui_crud_lab(object):
 
         self.retranslateUi(crud_lab)
         QtCore.QMetaObject.connectSlotsByName(crud_lab)
+        
+        self.boton_actualizar4.clicked.connect(self.actualizar_laboratorista)
+        self.boton_agregar4.clicked.connect(self.agregar_laboratorista)
+        self.boton_eliminar4.clicked.connect(self.eliminar_laboratorista)
+        self.boton_salir7.clicked.connect(self.salir)
+        self.tabla_lab.selectionModel().selectionChanged.connect(self.actualizar_campos)
+        
+    def actualizar_laboratorista(self):
+        fila_seleccionada = self.tabla_lab.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un laboratorista para actualizar.")
+            return
+        
+        laboratorista_id = self.tabla_lab.item(fila_seleccionada, 0).text()
+        
+        nombre = self.introducir_nom4.text()
+        apellido = self.introducir_ap4.text()
+        telefono = self.introducir_tel4.text()
+        email = self.introducir_email2.text()
+        
+        if not all([nombre, apellido, telefono, email]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if actualizar_laboratorista(laboratorista_id,nombre,apellido,telefono,email):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Laboratorista actualizado correctamente.")
+            leer_laboratorista(self.tabla_lab) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al actualizar laboratorista")
+            
+    def agregar_laboratorista(self):
+        fila_seleccionada = self.tabla_lab.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un laboratorista para actualizar.")
+            return
+        
+        nombre = self.introducir_nom4.text()
+        apellido = self.introducir_ap4.text()
+        telefono = self.introducir_tel4.text()
+        email = self.introducir_email2.text()
+        
+        if not all([nombre, apellido, telefono, email]):
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Completa todos los campos para actualizar.")
+            return
+        if crear_laboratorista(nombre,apellido,telefono,email):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Laboratorista creado correctamente.")
+            leer_laboratorista(self.tabla_lab) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al crear laboratorista")
+            
+    def eliminar_laboratorista(self):
+        fila_seleccionada = self.tabla_lab.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un laboratorista para eliminarlo.")
+            return
+        
+        laboratorista_id = self.tabla_lab.item(fila_seleccionada, 0).text()
+        
+        if eliminar_laboratorista(laboratorista_id):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Laboratorista eliminado correctamente.")
+            leer_laboratorista(self.tabla_lab) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al eliminar laboratorista")
+        
+    def actualizar_campos(self):
+        fila_seleccionada = self.tabla_lab.currentRow()
+        if fila_seleccionada == -1:
+            return
+
+        nombre = self.tabla_lab.item(fila_seleccionada, 1).text()  
+        apellido = self.tabla_lab.item(fila_seleccionada, 2).text()   
+        telefono = self.tabla_lab.item(fila_seleccionada, 3).text() 
+        email = self.tabla_lab.item(fila_seleccionada, 4).text() 
+
+        self.introducir_nom4.setText(nombre)
+        self.introducir_ap4.setText(apellido)
+        self.introducir_tel4.setText(telefono)
+        self.introducir_email2.setText(email)
+
+    def salir(self):
+        print("Cerrando el programa...")
+        QtWidgets.QApplication.instance().quit()
 
     def retranslateUi(self, crud_lab):
         _translate = QtCore.QCoreApplication.translate

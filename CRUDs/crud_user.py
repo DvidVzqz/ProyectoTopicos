@@ -202,10 +202,8 @@ class Ui_crud_user(object):
             QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un usuario para actualizar.")
             return
         
-        # Obtén el ID del usuario de la primera columna (o ajusta según la estructura)
         user_id = self.tabla_users.item(fila_seleccionada, 0).text()
         
-        # Obtén los nuevos valores de los campos de entrada
         nombre = self.introducir_nom.text()
         apellido = self.introducir_ap.text()
         usuario = self.introducir_user.text()
@@ -228,7 +226,6 @@ class Ui_crud_user(object):
             QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un usuario para actualizar.")
             return
         
-        # Obtén los nuevos valores de los campos de entrada
         nombre = self.introducir_nom.text()
         apellido = self.introducir_ap.text()
         usuario = self.introducir_user.text()

@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from DB import conectar
 import mysql.connector
-# Crear un usuario
+
 def crear_usuario(nombre, apellido, usuario, contraseña, rol, telefono):
     conn = conectar()
     cursor = conn.cursor()
@@ -25,7 +25,7 @@ def crear_usuario(nombre, apellido, usuario, contraseña, rol, telefono):
         cursor.close()
         conn.close()
 
-# Leer usuarios
+
 def leer_usuarios(tabla_users):
     conn = conectar()
     cursor = conn.cursor()
@@ -62,7 +62,7 @@ def leer_usuario_especifico(id_usuario):
         cursor.close()
         conn.close()
 
-# Actualizar un usuario
+
 def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, contraseña=None, rol=None, telefono=None):
     conn = conectar()
     cursor = conn.cursor()
@@ -86,7 +86,7 @@ def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, con
             valores.append(rol)
         if telefono:
             campos.append("telefono = %s")
-            valores.append(contraseña)
+            valores.append(telefono)
         valores.append(id_usuario)
 
         cursor.execute(f"""
@@ -104,7 +104,7 @@ def actualizar_usuario(id_usuario, nombre=None, apellido=None, usuario=None, con
         cursor.close()
         conn.close()
 
-# Eliminar un usuario
+
 def eliminar_usuario(id_usuario):
     conn = conectar()
     cursor = conn.cursor()

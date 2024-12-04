@@ -2,50 +2,49 @@ from PyQt5 import QtWidgets
 from DB import conectar
 import mysql.connector
 
-
-def crear_paciente(nombre, apellido, fecha_nacimiento, sexo, telefono):
+def crear_medico(nombre, apellido, especialidad, telefono, email):
     conn = conectar()
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO pacientes (nombre, apellido, fecha_nacimiento, sexo, telefono)
+            INSERT INTO medicos (nombre, apellido, especialidad, telefono, email)
             VALUES (%s, %s, %s, %s, %s)
-        """, (nombre, apellido, fecha_nacimiento, sexo, telefono))
+        """, (nombre, apellido, especialidad, telefono, email))
         conn.commit()
-        print("Paciente creado exitosamente.")
+        print("Medico creado exitosamente.")
         return True
     except mysql.connector.Error as err:
-        print("Error al crear paciente:", err)
+        print("Error al crear medico:", err)
         return False
     finally:
         cursor.close()
         conn.close()
 
 
-def leer_pacientes(tabla_pacientes):
+def leer_medico(tabla_medicos):
     conn = conectar()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT * FROM pacientes")
+        cursor.execute("SELECT * FROM medicos")
         resultados = cursor.fetchall()
 
-        tabla_pacientes.setRowCount(len(resultados))
-        tabla_pacientes.setColumnCount(len(resultados[0]) if resultados else 0)
-        tabla_pacientes.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
+        tabla_medicos.setRowCount(len(resultados))
+        tabla_medicos.setColumnCount(len(resultados[0]) if resultados else 0)
+        tabla_medicos.setHorizontalHeaderLabels([desc[0] for desc in cursor.description])
 
 
         for row_idx, row_data in enumerate(resultados):
             for col_idx, col_data in enumerate(row_data):
-                tabla_pacientes.setItem(row_idx, col_idx, QtWidgets.QTableWidgetItem(str(col_data)))
+                tabla_medicos.setItem(row_idx, col_idx, QtWidgets.QTableWidgetItem(str(col_data)))
 
     except mysql.connector.Error as err:
-        print("Error al leer pacientes:", err)
+        print("Error al leer medicos:", err)
     finally:
         cursor.close()
         conn.close()
 
 
-def actualizar_paciente(id_paciente, nombre=None, apellido=None, fecha_nacimiento=None, sexo=None, telefono=None):
+def actualizar_medico(id_medico, nombre=None, apellido=None, especialidad=None, telefono=None, email=None):
     conn = conectar()
     cursor = conn.cursor()
     try:
@@ -57,43 +56,43 @@ def actualizar_paciente(id_paciente, nombre=None, apellido=None, fecha_nacimient
         if apellido:
             campos.append("apellido = %s")
             valores.append(apellido)
-        if fecha_nacimiento:
-            campos.append("fecha_nacimiento = %s")
-            valores.append(fecha_nacimiento)
-        if sexo:
-            campos.append("sexo = %s")
-            valores.append(sexo)
+        if especialidad:
+            campos.append("especialidad = %s")
+            valores.append(especialidad)
         if telefono:
             campos.append("telefono = %s")
             valores.append(telefono)
-        valores.append(id_paciente)
+        if email:
+            campos.append("email = %s")
+            valores.append(email)
+        valores.append(id_medico)
 
         cursor.execute(f"""
-            UPDATE pacientes
+            UPDATE medicos
             SET {", ".join(campos)}
-            WHERE id_paciente = %s
+            WHERE id_medico = %s
         """, valores)
         conn.commit()
-        print("Paciente actualizado exitosamente.")
+        print("Medico actualizado exitosamente.")
         return True
     except mysql.connector.Error as err:
-        print("Error al actualizar paciente:", err)
+        print("Error al actualizar medico:", err)
         return False
     finally:
         cursor.close()
         conn.close()
 
 
-def eliminar_paciente(id_paciente):
+def eliminar_medico(id_medico):
     conn = conectar()
     cursor = conn.cursor()
     try:
-        cursor.execute("DELETE FROM pacientes WHERE id_paciente = %s", (id_paciente,))
+        cursor.execute("DELETE FROM medicos WHERE id_medico = %s", (id_medico))
         conn.commit()
-        print("Paciente eliminado exitosamente.")
+        print("Medico eliminado exitosamente.")
         return True
     except mysql.connector.Error as err:
-        print("Error al eliminar paciente:", err)
+        print("Error al eliminar medico:", err)
         return False
     finally:
         cursor.close()
