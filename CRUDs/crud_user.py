@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from Usuarios import leer_usuarios, actualizar_usuario, crear_usuario
+from Usuarios import leer_usuarios, actualizar_usuario, crear_usuario, eliminar_usuario
 
 
 class Ui_crud_user(object):
@@ -192,6 +192,8 @@ class Ui_crud_user(object):
         
         self.boton_actualizar.clicked.connect(self.actualizar_usuario)
         self.boton_agregar.clicked.connect(self.agregar_usuario)
+        self.boton_eliminar.clicked.connect(self.eliminar_usuario)
+        self.boton_salir4.clicked.connect(self.salir)
         self.tabla_users.selectionModel().selectionChanged.connect(self.actualizar_campos)
         
     def actualizar_usuario(self):
@@ -218,7 +220,7 @@ class Ui_crud_user(object):
             QtWidgets.QMessageBox.information(None, "Éxito", "Usuario actualizado correctamente.")
             leer_usuarios(self.tabla_users) 
         else:
-            QtWidgets.QMessageBox.critical(None, "Error", f"Error al actualizar: {err}")
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al actualizar Usuario")
         
     def agregar_usuario(self):
         fila_seleccionada = self.tabla_users.currentRow()
@@ -241,12 +243,26 @@ class Ui_crud_user(object):
             QtWidgets.QMessageBox.information(None, "Éxito", "Usuario creado correctamente.")
             leer_usuarios(self.tabla_users) 
         else:
-            QtWidgets.QMessageBox.critical(None, "Error", f"Error al crear: {err}")
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al crear Usuario")
 
+    def eliminar_usuario(self):
+        fila_seleccionada = self.tabla_users.currentRow()
+        if fila_seleccionada == -1:
+            QtWidgets.QMessageBox.warning(None, "Advertencia", "Selecciona un usuario para eliminarlo.")
+            return
+        
+        user_id = self.tabla_users.item(fila_seleccionada, 0).text()
+        
+        if eliminar_usuario(user_id):
+            QtWidgets.QMessageBox.information(None, "Éxito", "Usuario eliminado correctamente.")
+            leer_usuarios(self.tabla_users) 
+        else:
+            QtWidgets.QMessageBox.critical(None, "Error", "Error al eliminar Usuario")
+    
     def actualizar_campos(self):
         fila_seleccionada = self.tabla_users.currentRow()
         if fila_seleccionada == -1:
-                return
+            return
 
         nombre = self.tabla_users.item(fila_seleccionada, 1).text()  
         apellido = self.tabla_users.item(fila_seleccionada, 2).text()  
@@ -264,7 +280,11 @@ class Ui_crud_user(object):
         # Selecciona el rol correspondiente
         index_rol = self.introducir_rol.findText(rol)
         if index_rol != -1:
-                self.introducir_rol.setCurrentIndex(index_rol)
+              self.introducir_rol.setCurrentIndex(index_rol)
+
+    def salir(self):
+        print("Cerrando el programa...")
+        QtWidgets.QApplication.instance().quit()
 
     def retranslateUi(self, crud_user):
         _translate = QtCore.QCoreApplication.translate

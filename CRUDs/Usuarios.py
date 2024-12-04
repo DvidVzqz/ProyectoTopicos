@@ -6,6 +6,11 @@ def crear_usuario(nombre, apellido, usuario, contraseña, rol, telefono):
     conn = conectar()
     cursor = conn.cursor()
     try:
+        cursor.execute("SELECT 1 FROM usuarios WHERE usuario = %s", (usuario,))
+        if cursor.fetchone():
+            print(f"Error: El usuario '{usuario}' ya existe.")
+            return False
+        
         cursor.execute("""
             INSERT INTO usuarios (nombre, apellido, usuario, contraseña, rol, telefono)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -107,8 +112,10 @@ def eliminar_usuario(id_usuario):
         cursor.execute("DELETE FROM usuarios WHERE id_usuario = %s", (id_usuario,))
         conn.commit()
         print("Usuario eliminado exitosamente.")
+        return True
     except mysql.connector.Error as err:
         print("Error al eliminar usuario:", err)
+        return False
     finally:
         cursor.close()
         conn.close()
